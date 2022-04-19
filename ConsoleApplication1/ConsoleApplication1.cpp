@@ -1,20 +1,141 @@
-﻿// ConsoleApplication1.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
+﻿#include <iostream> 
+#include <io.h> 
+#include <windows.h> 
+#include <direct.h>
+using namespace std;
+#define _CRT_SECURE_NO_WARNINGS
+FILE* f;
+void SwitchCatalog(char* catalog)
+{
+    system("csl");
+    cout << "input catalog" << endl;
+    cin >> catalog;
 
-#include <iostream>
+}
+void findfile2(char* s)
+{
+    _finddata_t finfo;
+    char str[250];
+    strcpy_s(str, 250, s);
+    strcat_s(str, 250, "\\");
+    strcat_s(str, "*.*");
+    int file = _findfirst(str, &finfo);
+    int tmp = file;
+
+    while (tmp != -1) {
+        if (strcmp(finfo.name, ".") != 0 && strcmp(finfo.name, "..") != 0) {
+            if ((finfo.attrib & _A_SUBDIR) == _A_SUBDIR) {
+                strcpy_s(str, 250, s);
+                strcat_s(str, 250, "\\");
+                strcat_s(str, 250, finfo.name);
+                cout << "Directory:" << str << endl;
+                findfile2(str);
+            }
+            else
+                cout << "File: " << finfo.name << endl;
+        }
+        tmp = _findnext(file, &finfo);
+
+    }
+
+
+    _findclose(file);
+}
+void findfile(char* s)
+{
+    _finddata_t finfo;
+    char str[250];
+    strcpy_s(str, 250, s);
+    strcat_s(str, 250, "\\");
+    strcat_s(str, "*.*");
+    int file = _findfirst(str, &finfo);
+    int tmp = file;
+
+    while (tmp != -1) {
+        if ((finfo.attrib & _A_SUBDIR) == _A_SUBDIR) {
+            strcpy_s(str, 250, s);
+            strcat_s(str, 250, "\\");
+            strcat_s(str, 250, finfo.name);
+            cout << "Directory:" << str << endl;
+        }
+        else
+            cout << "File: " << finfo.name << endl;
+        tmp = _findnext(file, &finfo);
+    }
+
+
+    _findclose(file);
+}
+void CreatNewCatalog(char* s)
+{
+    char str[250];
+    char name[255];
+    strcpy_s(str, 250, s);
+
+    cout << "name forward: ";
+    cin >> name;
+    strcat_s(str, 250, "\\");
+    strcat_s(str, 250, name);
+    _mkdir(str);
+}
+void DeletCatalog(char* s)
+{
+    char name[250], name2[250];
+    strcpy_s(name, 250, s);
+    cout << "Введите папку для удаления :";
+    cin >> name2;
+    strcat_s(name, "\\");
+    strcat_s(name, name2);
+    _rmdir(name);
+
+}
+
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    char catalog[220];
+    cout << "input catalog" << endl;
+    cin >> catalog;
+    do
+    {
+        int c = 1;
+        do
+        {
+            cout << "\nВведите 0 что бы продолжить : ";
+            cin >> c;
+            system("cls");
+        } while (c != 0);
+
+        cout << "Текущая директория: " << catalog << endl;
+        cout << "1. Смена текущего каталога(путь к текущему каталогу должен всегда отображаться на экране)\n2. Отображение всех подкаталогов текущего каталога\n3. Отображение всех файлов текущего каталога\n4. Создание нового каталога в текущем каталоге\n5. Удаление уже существующего каталога" << endl;
+        int mains;
+        cin >> mains;
+        switch (mains)
+        {
+        case 1:
+            SwitchCatalog(catalog);
+            cout << catalog;
+            system("cls");
+            break;
+        case 2:
+            system("cls");
+            findfile(catalog);
+            break;
+        case 3:
+            system("cls");
+            findfile2(catalog);
+            break;
+
+        case 4:
+            system("cls");
+            CreatNewCatalog(catalog);
+            break;
+        case 5:
+            system("cls");
+            DeletCatalog(catalog);
+            break;
+        }
+    } while (1);
 }
-
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
-
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
